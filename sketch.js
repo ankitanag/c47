@@ -3,8 +3,10 @@ var jet,jet_img,meteor_img;
 var bg_img;
 
 var meteoroid;
-var meteroidg;
-var bulletg;
+var meteroidg, meteroidg1;
+
+var bulletg,go,go_img;
+var gameState = "play";
 
 
 function preload()
@@ -12,6 +14,7 @@ function preload()
   jet_img = loadImage("dd.png");
   bg_img = loadImage("bg.png");
   meteor_img = loadImage("meteor.png");
+  go_img = loadImage("game_over.png");
 }
 
 function setup() {
@@ -22,7 +25,13 @@ function setup() {
   jet.scale = 0.25;
 
   meteroidg = new Group();
+  meteroidg1 = new Group();
   bulletg = new Group();
+
+  go = createSprite(500,350,50,50);
+  go.addImage(go_img);
+  go.scale = 0.25;
+  go.visible = false;
 
 
 
@@ -34,38 +43,52 @@ function draw()
   background(51);
   image(bg_img,0,0);
 
-  spawnMeteoroids();
+  if(gameState === "play"){
+    spawnMeteoroids();
 
-  if(keyDown("space")){
-    bullet();
-  }
+    if(keyDown("space") && gameState === "play"){
+      bullet();
+    }
+  
+    if(keyDown("left")){
+      jet.x = jet.x - 10;
+    }
+    if(keyDown("right")){
+      jet.x = jet.x + 10;
+    }
+  
+    if (bulletg.isTouching(meteroidg)) {
+        meteroidg.destroyEach();
+       bulletg.destroyEach();
+    }
+  
+    if (meteroidg.isTouching(jet)){
+      jet.destroy();
+      bulletg.destroyEach();
+      gameState = "end"
+    }
 
-  if(keyDown("left")){
-    jet.x = jet.x - 10;
+    if (meteroidg1.isTouching(jet)){
+      jet.destroy();
+      bulletg.destroyEach();
+      gameState = "end"
+    }
+  
+    // if(bullet.isTouching(meteoroid)){
+    //   meteoroid.destroy();
+    // }
   }
-  if(keyDown("right")){
-    jet.x = jet.x + 10;
-  }
+  if(gameState === "end"){
 
-  if (bulletg.isTouching(meteroidg)) {
-      meteroidg.destroyEach();
-     bulletg.destroyEach();
+    go.visible = true;
+       
   }
-
-  if (meteroidg.isTouching(jet)){
-    jet.destroy();
-    bulletg.destroyEach();
-  }
-
-  // if(bullet.isTouching(meteoroid)){
-  //   meteoroid.destroy();
-  // }
  
   drawSprites();
 }
 
 function spawnMeteoroids(){
-  if(frameCount % 60 === 0){
+  if(frameCount % 100 === 0){
     meteoroid = createSprite(random(10,900),0,10,10);
     meteoroid.addImage(meteor_img);
     meteoroid.scale = 0.25;
@@ -74,6 +97,18 @@ function spawnMeteoroids(){
     meteroidg.add(meteoroid);
   }
 }
+
+function spawnMeteoroids1(){
+  if(frameCount % 100 === 0){
+    meteoroid1 = createSprite(random(10,900),0,10,10);
+    meteoroid1.addImage(meteor_img);
+    meteoroid1.scale = 0.25;
+    meteoroid1.velocityY = 3;
+
+    meteroidg1.add(meteoroid);
+  }
+}
+
 
 
 
